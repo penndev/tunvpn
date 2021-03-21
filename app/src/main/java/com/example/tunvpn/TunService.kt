@@ -8,6 +8,7 @@ import android.content.Intent
 import android.net.VpnService
 import android.os.Build
 import android.os.ParcelFileDescriptor
+import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import java.util.concurrent.ExecutorService
@@ -18,13 +19,12 @@ class TunService : VpnService() {
 
     private val executorService: ExecutorService = Executors.newFixedThreadPool(4)
 
+    public var interFace:ParcelFileDescriptor? = null
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         Toast.makeText(this, "TunService 启动", Toast.LENGTH_LONG).show()
         foreground("启动ing", "后台正在启动中..")
-
-
-
         executorService.submit(TunConnect(this))
 
         return super.onStartCommand(intent, flags, startId)
@@ -48,26 +48,33 @@ class TunService : VpnService() {
                  PendingIntent.getActivity(this, 0, notificationIntent, 0)
              }
          val notification: Notification = Notification.Builder(this, "TunVpn")
-            .setContentTitle(getText(R.string.app_name))
-            .setContentText(getText(R.string.notification_message))
+            .setContentTitle(title)
+            .setContentText(message)
             .setSmallIcon(R.drawable.ic_vpn_conn_notification)
             .setContentIntent(pendingIntent)
             .setTicker("getText(R.string.ticker_text)")
             .build()
 
-        // Notification ID cannot be 0.
-        startForeground(1, notification)
-
+         // Notification ID cannot be 0.
+         startForeground(1, notification)
     }
 
-    public fun getInterFace() : ParcelFileDescriptor? {
+    @RequiresApi(Build.VERSION_CODES.O)
+    public fun setInterFace() : Boolean {
         val builder = Builder()
-        val tun = builder
-                .addAddress("192.168.2.2", 24)
+        interFace = builder
+                .setMtu(1400)
+                .addAddress("10.0.0.2", 32)
                 .addRoute("0.0.0.0", 0)
                 .addDnsServer("114.114.114.114")
                 .establish()
-        return tun
+
+        if (interFace == null){
+            foreground("启动fail", "启动失败。")
+            return false
+        }
+
+        return true
     }
 
 }

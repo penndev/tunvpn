@@ -1,8 +1,8 @@
 package com.example.tunvpn
 
-import android.net.VpnService
-import android.os.Handler
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.net.InetSocketAddress
@@ -10,28 +10,44 @@ import java.nio.ByteBuffer
 import java.nio.channels.DatagramChannel
 
 
-class TunConnect(s:TunService ): Runnable {
+class TunConnect(s: TunService): Runnable {
     private val tunService = s
+
     override fun run() {
         try {
+
             val srv = DatagramChannel.open()
+            tunService.protect(srv.socket())
             val srvAddr = InetSocketAddress("192.168.0.136", 8000)
             srv.connect(srvAddr)
+            srv.configureBlocking(false)
 
-            val tunDev = tunService.getInterFace()
-            val tunRead = FileInputStream(tunDev?.fileDescriptor).channel
-            val tunWrite = FileOutputStream(tunDev?.fileDescriptor).channel
-//
-            val buf = ByteBuffer.allocate(16384)
-            Log.d("penn", "I am here...");
+
+            tunService.setInterFace()
+            val fd = tunService.interFace?.getFileDescriptor()
+
+            val tunRead = FileInputStream(fd)
+            val tunWrite = FileOutputStream(fd)
+
+            val buf = ByteBuffer.allocate(32767)
+
             while (true){
-                var len = tunRead.read(buf)
-                srv.write(buf)
-                buf.clear()
+                var len = tunRead.read(buf.array())
+                if (len > 0){
+                    Log.d("penn", "读取发送数据字节：" + len.toString())
+                    buf.limit(len)
+                    srv.write(buf)
+                    buf.clear()
+                }
 
                 len = srv.read(buf)
-                tunWrite.write(buf)
-                buf.clear()
+                if (len > 0){
+                    Log.d("penn", "写入收到数据字节：" + len.toString())
+                    tunWrite.write(buf.array(), 0, len)
+                    buf.clear()
+                }
+
+                Log.d("penn", "debugllll")
             }
 
         }catch (e: Exception) {
