@@ -15,13 +15,12 @@ class TunConnect(s: TunService): Runnable {
 
     override fun run() {
         try {
-
+            Log.d("penn","TunConnect.run()")
             val srv = DatagramChannel.open()
             tunService.protect(srv.socket())
             val srvAddr = InetSocketAddress("192.168.0.136", 8000)
             srv.connect(srvAddr)
             srv.configureBlocking(false)
-
 
             tunService.setInterFace()
             val fd = tunService.interFace?.getFileDescriptor()
@@ -47,7 +46,6 @@ class TunConnect(s: TunService): Runnable {
                     buf.clear()
                 }
 
-                Log.d("penn", "debugllll")
             }
 
         }catch (e: Exception) {

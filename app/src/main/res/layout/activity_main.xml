@@ -7,19 +7,50 @@
     android:paddingTop="40dp"
     android:orientation="vertical" >
 
-    <Button
-        android:onClick="startTunService"
-        android:id="@+id/button_start"
+    <EditText
+        android:id="@+id/editText_ip"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/vpn_start" />
+        android:layout_marginTop="75dp"
+        android:hint="@string/edit_ip"></EditText>
 
-    <Button
-        android:onClick="stopTunService"
-        android:id="@+id/button_stop"
+    <EditText
+        android:id="@+id/editText_port"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/vpn_stop" />
+        android:inputType="number"
+        android:layout_marginTop="50dp"
+        android:hint="@string/edit_port"></EditText>
+
+
+
+
+<!--    <Button-->
+<!--        android:onClick="startTunService"-->
+<!--        android:id="@+id/button_start"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="@string/vpn_start" />-->
+
+<!--    <Button-->
+<!--        android:onClick="stopTunService"-->
+<!--        android:id="@+id/button_stop"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="@string/vpn_stop" />-->
+
+    <ImageButton
+        android:id="@+id/run"
+        android:onClick="runBtn"
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:scaleType="centerCrop"
+        android:background="@drawable/ic_main_run_off"
+        android:layout_gravity="center"
+        android:layout_marginTop="200dp"
+        ></ImageButton>
+
+
 
 </LinearLayout>
 
