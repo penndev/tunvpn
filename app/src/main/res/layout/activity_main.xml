@@ -23,6 +23,14 @@
         android:hint="@string/edit_port"></EditText>
 
 
+    <EditText
+        android:id="@+id/editText_dns"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:layout_marginTop="50dp"
+        android:text="8.8.8.8"
+        android:hint="@string/edit_dns"></EditText>
 
 
 <!--    <Button-->

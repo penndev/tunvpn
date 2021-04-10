@@ -9,63 +9,72 @@ import android.content.Intent
 import android.net.VpnService
 import android.os.Build
 import android.os.ParcelFileDescriptor
+import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import kotlin.properties.Delegates
 
 
 class TunService : VpnService() {
 
     private val executorService: ExecutorService = Executors.newFixedThreadPool(1)
 
-    var interFace:ParcelFileDescriptor? = null
+    private var isRun = false
 
-    private var runing = 0
+    public var interFace:ParcelFileDescriptor? = null
+    public lateinit var SrvIP:String
+    public var SrvPort = -1
+
+    public var VpnAddr = "10.0.0.2"
+    public var VpnDNS = "8.8.8.8"
 
     override fun onCreate() {
         super.onCreate()
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun onStart(){
-        if (runing == 1){
-            return
-        }
-        foreground("启动中", "正在启动中..")
-        Toast.makeText(this, "TunService 启动", Toast.LENGTH_LONG).show()
-        executorService.submit(TunConnect(this))
-        runing = 1
-    }
-
-    private fun destroy(){
-        runing = 0
-        executorService.shutdownNow()
-        Toast.makeText(this, "TunService 销毁", Toast.LENGTH_LONG).show()
-        stopSelf()
-        interFace?.close()
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-        val command = intent.getIntExtra("start", -1)
-        if (command == 1){
-            onStart()
-        }else if (command == 0){
+        val status = intent.getBooleanExtra("status",false)
+        Log.d("penndev", status.toString())
+        if (status){
+            if (isRun){
+                return super.onStartCommand(intent, flags, startId)
+            }
+            isRun = true
+            foreground("启动中", "正在启动中..")
+            setInterFace()
+            executorService.submit(TunConnect(this))
+        }else{
+            isRun = false
             destroy()
         }
+
         return super.onStartCommand(intent, flags, startId)
     }
 
+
+
+
+    private fun destroy(){
+        executorService.shutdownNow()
+//        Toast.makeText(this, "TunService 销毁", Toast.LENGTH_LONG).show()
+        interFace?.close()
+        stopSelf()
+    }
+
+
+
     override fun onDestroy() { destroy() }
 
-    fun setInterFace() : Boolean {
+    private fun setInterFace() : Boolean {
         val builder = Builder()
         interFace = builder
                 .setMtu(1400)
-                .addAddress("10.0.0.2", 32)
+                .addAddress(VpnAddr, 32)
                 .addRoute("0.0.0.0", 0)
-                .addDnsServer("114.114.114.114")
+                .addDnsServer(VpnDNS)
                 .establish()
 
         if (interFace == null){
@@ -77,7 +86,7 @@ class TunService : VpnService() {
 
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun foreground(title: String, message: String) {
+    public fun foreground(title: String, message: String) {
         val appId = getText(R.string.app_name) as String?
         val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannel(NotificationChannel(appId, appId, NotificationManager.IMPORTANCE_DEFAULT))

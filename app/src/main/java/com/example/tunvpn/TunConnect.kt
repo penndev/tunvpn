@@ -1,8 +1,8 @@
 package com.example.tunvpn
 
-import android.os.Build
+import android.content.SharedPreferences
 import android.util.Log
-import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.net.InetSocketAddress
@@ -11,6 +11,11 @@ import java.nio.channels.DatagramChannel
 
 
 class TunConnect(s: TunService): Runnable {
+
+
+
+
+
     private val tunService = s
 
     override fun run() {
@@ -22,7 +27,7 @@ class TunConnect(s: TunService): Runnable {
             srv.connect(srvAddr)
             srv.configureBlocking(false)
 
-            tunService.setInterFace()
+//            tunService.setInterFace()
             val fd = tunService.interFace?.getFileDescriptor()
 
             val tunRead = FileInputStream(fd)
