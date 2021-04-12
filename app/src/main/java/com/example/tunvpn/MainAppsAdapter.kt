@@ -1,6 +1,5 @@
 package com.example.tunvpn
 
-import android.R
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.view.View
@@ -8,10 +7,9 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.ImageView
 import android.widget.TextView
-import kotlin.collections.ArrayList
 
 
-class MainAppsAdapter(context:Context,apps:List<ApplicationInfo>) : BaseAdapter() {
+class MainAppsAdapter(context:Context,apps:List<ApplicationInfo>): BaseAdapter() {
     private var context = context
     private var apps = apps
     private val pm = context.getPackageManager()
@@ -31,9 +29,9 @@ class MainAppsAdapter(context:Context,apps:List<ApplicationInfo>) : BaseAdapter(
         var newView:View
         var viewHolder = ViewHolder()
         if (convertView == null) {
-            newView = View.inflate(context,R.layout.activity_list_item,null)
-            viewHolder.appName = newView.findViewById<TextView>(R.id.text1)
-            viewHolder.appIcon = newView.findViewById<ImageView>(R.id.icon)
+            newView = View.inflate(context, R.layout.activity_main_app_item ,null)
+            viewHolder.appName = newView.findViewById<TextView>(R.id.item_appname)
+            viewHolder.appIcon = newView.findViewById<ImageView>(R.id.item_appicon)
             newView.setTag(viewHolder)
         }else{
             newView = convertView
@@ -41,9 +39,7 @@ class MainAppsAdapter(context:Context,apps:List<ApplicationInfo>) : BaseAdapter(
         }
 
         viewHolder.appName.setText( apps[position].loadLabel(pm).toString() )
-
         viewHolder.appIcon.setImageDrawable(apps[position].loadIcon(pm))
-
         return newView
     }
 
@@ -51,5 +47,6 @@ class MainAppsAdapter(context:Context,apps:List<ApplicationInfo>) : BaseAdapter(
         lateinit var appName:TextView
         lateinit var appIcon:ImageView
     }
+
 
 }

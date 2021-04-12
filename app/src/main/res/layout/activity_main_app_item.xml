@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:descendantFocusability="blocksDescendants"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="5dp"
+    android:paddingBottom="5dp"
+    android:paddingLeft="8dp"
+    android:paddingRight="12dp">
+
+    <ImageView android:id="@+id/item_appicon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"/>
+
+    <TextView android:id="@+id/item_appname"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textSize="16dp"
+        android:layout_gravity="center"
+        android:paddingStart="?android:attr/listPreferredItemPaddingStart"
+        android:paddingLeft="?android:attr/listPreferredItemPaddingLeft" />
+
+    <CheckBox
+        android:id="@+id/item_selected"
+        android:layout_gravity="center"
+        android:layout_width="25dp"
+        android:layout_marginRight="1dp"
+        android:layout_height="25dp"></CheckBox>
+</LinearLayout>
+
