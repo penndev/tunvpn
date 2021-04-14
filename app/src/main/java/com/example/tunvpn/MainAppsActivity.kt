@@ -8,6 +8,7 @@ import android.widget.*
 
 class MainAppsActivity : AppCompatActivity() {
 
+    val databaseHelp = DatabaseHelper(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -19,12 +20,17 @@ class MainAppsActivity : AppCompatActivity() {
         appList.adapter = appsAdapter
         appList.setOnItemClickListener { parent, view, position, id ->
             val itemCB = view.findViewById<CheckBox>(R.id.item_selected)
+            itemCB.isChecked = !itemCB.isChecked
+
             if (itemCB.isChecked){
-                itemCB.isChecked = false
-            }else{
-                itemCB.isChecked = true
+                val id = databaseHelp.addAllow(packages[position].packageName)
+                Log.d("penn","add finish id:"+id.toString())
             }
+
+            Log.d("penn","checkobx status:"+itemCB.isChecked)
         }
+        Log.d("penn","I 澳门 ")
     }
+
 
 }
