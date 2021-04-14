@@ -1,3 +1,14 @@
+// docker run  -id  --cap-add=NET_ADMIN --name=TunVpn -p 8000:8000/udp tunvpn:v1 /bin/bash
+
+// apt-get update &&
+// apt-get -y install net-tools iptables iproute2 &&
+
+// mkdir /dev/net &&
+// mknod /dev/net/tun c 10 200
+
+// iptables -t nat -A POSTROUTING -s 10.0.0.0/8 -o eth0 -j MASQUERADE &&
+// ip tuntap add dev tun0 mode tun &&
+// ifconfig tun0 10.0.0.1 dstaddr 10.0.0.2 up
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
