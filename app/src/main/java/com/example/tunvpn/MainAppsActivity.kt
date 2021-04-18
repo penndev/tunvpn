@@ -16,20 +16,23 @@ class MainAppsActivity : AppCompatActivity() {
 
         val appList = findViewById<ListView>(R.id.main_apps)
         val packages = packageManager.getInstalledApplications(PackageManager.GET_META_DATA)
-        val appsAdapter = MainAppsAdapter(this,packages)
+        val appsAdapter = MainAppsAdapter(this,packages,databaseHelp.getAllow())
         appList.adapter = appsAdapter
+
         appList.setOnItemClickListener { parent, view, position, id ->
             val itemCB = view.findViewById<CheckBox>(R.id.item_selected)
             itemCB.isChecked = !itemCB.isChecked
 
             if (itemCB.isChecked){
                 val id = databaseHelp.addAllow(packages[position].packageName)
-                Log.d("penn","add finish id:"+id.toString())
+            }else{
+                databaseHelp.delAllow(packages[position].packageName)
             }
-
-            Log.d("penn","checkobx status:"+itemCB.isChecked)
         }
-        Log.d("penn","I 澳门 ")
+
+
+
+
     }
 
 

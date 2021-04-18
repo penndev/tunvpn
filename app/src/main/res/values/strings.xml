@@ -4,8 +4,8 @@
     <string name="vpn_start">启动</string>
     <string name="vpn_stop">停止</string>
 
-    <string name="edit_ip">服务器地址:</string>
-    <string name="edit_port">服务器端口:</string>
-    <string name="edit_dns">DNS服务器:</string>
+    <string name="edit_ip"> 服务器:</string>
+    <string name="edit_port"> 端口:</string>
+    <string name="edit_dns"> DNS:</string>
     <string name="notification_message">Vpn启动中</string>
 </resources>

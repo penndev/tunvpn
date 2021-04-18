@@ -2,50 +2,44 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingLeft="16dp"
-    android:paddingRight="16dp"
-    android:paddingTop="40dp"
+    android:paddingLeft="8dp"
+    android:paddingRight="8dp"
+    android:paddingTop="20dp"
     android:orientation="vertical" >
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/edit_ip"></TextView>
     <EditText
         android:id="@+id/editText_ip"
         android:layout_width="match_parent"
+        android:layout_height="45dp"></EditText>
+
+    <TextView
+        android:layout_marginTop="20dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="75dp"
-        android:hint="@string/edit_ip"></EditText>
+        android:text="@string/edit_port"></TextView>
 
     <EditText
         android:id="@+id/editText_port"
         android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:inputType="number"></EditText>
+
+
+    <TextView
+        android:layout_marginTop="20dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:inputType="number"
-        android:layout_marginTop="50dp"
-        android:hint="@string/edit_port"></EditText>
+        android:text="@string/edit_dns"></TextView>
 
-
-    <EditText
+    <Spinner
         android:id="@+id/editText_dns"
+        style="@style/Widget.AppCompat.Spinner.Underlined"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="number"
-        android:layout_marginTop="50dp"
-        android:text="8.8.8.8"
-        android:hint="@string/edit_dns"></EditText>
-
-
-<!--    <Button-->
-<!--        android:onClick="startTunService"-->
-<!--        android:id="@+id/button_start"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:text="@string/vpn_start" />-->
-
-<!--    <Button-->
-<!--        android:onClick="stopTunService"-->
-<!--        android:id="@+id/button_stop"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:text="@string/vpn_stop" />-->
+        android:layout_height="wrap_content" />
 
     <ImageButton
         android:id="@+id/run"
@@ -57,7 +51,6 @@
         android:layout_gravity="center"
         android:layout_marginTop="200dp"
         ></ImageButton>
-
 
 
 </LinearLayout>

@@ -7,7 +7,9 @@ import android.net.VpnService
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.ArrayAdapter
 import android.widget.EditText
+import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 
@@ -33,7 +35,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        editTextDNS = findViewById(R.id.editText_dns)
+//        editTextDNS = findViewById(R.id.editText_dns)
         editTextIp = findViewById(R.id.editText_ip)
         editTextPort = findViewById(R.id.editText_port)
 
@@ -41,6 +43,17 @@ class MainActivity : AppCompatActivity() {
         if (ip != ""){ editTextIp.setText(ip) }
         val port = prefs.getInt(getString(R.string.edit_port), 0)
         if (port > 0){ editTextPort.setText(port.toString()) }
+
+        val spinner: Spinner = findViewById(R.id.editText_dns)
+        ArrayAdapter.createFromResource(
+                this,
+                R.array.dns_array,
+                android.R.layout.simple_spinner_item
+        ).also { adapter ->
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            spinner.adapter = adapter
+        }
+
 
         packageList()
     }
@@ -98,7 +111,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun packageList(){
-        startActivity(Intent(this, MainAppsActivity::class.java))
+//        startActivity(Intent(this, MainAppsActivity::class.java))
     }
 //
 //
