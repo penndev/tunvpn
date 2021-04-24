@@ -2,7 +2,7 @@
 
 ###  Download apk
 
-[Click here](../../release)  to download the release apk file
+[Click here](../../releases)  to download the release apk file
 
 
 ### Configure the tunnel On the docker
