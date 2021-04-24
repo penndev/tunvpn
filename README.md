@@ -2,12 +2,12 @@
 
 ###  Download apk
 
-[Click here]("./release")  to download the release apk file
+[Click here](../../release)  to download the release apk file
 
 
 ### Configure the tunnel On the docker
 
-1.  进入[部署目录]("./server") 
+1.  进入[部署目录](./server) 
 
     ```shell
     cd ./server
