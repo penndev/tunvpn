@@ -24,6 +24,7 @@
 
     <EditText
         android:id="@+id/editText_port"
+        style="@style/Widget.AppCompat.EditText"
         android:layout_width="match_parent"
         android:layout_height="45dp"
         android:inputType="number"></EditText>
@@ -37,7 +38,9 @@
 
     <Spinner
         android:id="@+id/editText_dns"
-        style="@style/Widget.AppCompat.Spinner.Underlined"
+        android:background="@drawable/bg_square_select"
+        style="@style/Widget.AppCompat.EditText"
+
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 

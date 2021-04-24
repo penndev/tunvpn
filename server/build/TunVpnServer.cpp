@@ -1,14 +1,4 @@
-// docker run  -id  --cap-add=NET_ADMIN --name=TunVpn -p 8000:8000/udp tunvpn:v1 /bin/bash
-
-// apt-get update &&
-// apt-get -y install net-tools iptables iproute2 &&
-
-// mkdir /dev/net &&
-// mknod /dev/net/tun c 10 200
-
-// iptables -t nat -A POSTROUTING -s 10.0.0.0/8 -o eth0 -j MASQUERADE &&
-// ip tuntap add dev tun0 mode tun &&
-// ifconfig tun0 10.0.0.1 dstaddr 10.0.0.2 up
+// .
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -73,18 +63,15 @@ static int get_tunnel(char *port, char * packet,ssize_t * n )
         usleep(100000);
     }
 
-    // Receive packets till the secret matches.
-    // char packet[1024];
     socklen_t addrlen;
-    // do {
-        addrlen = sizeof(addr);
-        *n = recvfrom(tunnel, packet, sizeof(packet), 0,
-                (sockaddr *)&addr, &addrlen);
-        if (n <= 0) {
-            return -1;
-        }
-    // } while (packet[0] != 0 || strcmp(secret, &packet[1]));
-
+ 
+	addrlen = sizeof(addr);
+	*n = recvfrom(tunnel, packet, sizeof(packet), 0,
+			(sockaddr *)&addr, &addrlen);
+	if (n <= 0) {
+		return -1;
+	}
+	
     // Connect to the client as we only handle one client at a time.
     connect(tunnel, (sockaddr *)&addr, addrlen);
     return tunnel;

@@ -7,17 +7,14 @@ import android.net.VpnService
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.ArrayAdapter
-import android.widget.EditText
-import android.widget.Spinner
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 
     private lateinit var editTextIp: EditText
     private lateinit var editTextPort: EditText
-    private lateinit var editTextDNS: EditText
+    private lateinit var editTextDNS: Spinner
 
     private var status: Boolean = false
 
@@ -44,18 +41,17 @@ class MainActivity : AppCompatActivity() {
         val port = prefs.getInt(getString(R.string.edit_port), 0)
         if (port > 0){ editTextPort.setText(port.toString()) }
 
-        val spinner: Spinner = findViewById(R.id.editText_dns)
+        val editTextDNS: Spinner = findViewById(R.id.editText_dns)
         ArrayAdapter.createFromResource(
                 this,
                 R.array.dns_array,
                 android.R.layout.simple_spinner_item
         ).also { adapter ->
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            spinner.adapter = adapter
+            editTextDNS.adapter = adapter
         }
+        editTextDNS.onItemSelectedListener = this
 
-
-        packageList()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -90,51 +86,24 @@ class MainActivity : AppCompatActivity() {
                 prefsEdit.putInt(getString(R.string.edit_port), port)
                 bundle.putInt("port",port)
             }
-            if ( editTextDNS.text.isEmpty()){
-                val dns = editTextDNS.text.toString()
-                prefsEdit.putString(getString(R.string.edit_dns), dns)
-                bundle.putString("dns",dns)
-            }
             prefsEdit.apply()
-
             val prepare = VpnService.prepare(this)
             if (prepare != null){
                 startActivityForResult(prepare, 1)
             }
-
             bundle.putBoolean("status", status)
-
-
             startService(interService.putExtras(bundle))
             view.setBackgroundResource(R.drawable.ic_main_run_on)
         }
     }
 
-    fun packageList(){
-//        startActivity(Intent(this, MainAppsActivity::class.java))
+    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+        val prefsEdit = prefs.edit()
+        prefsEdit.putString(getString(R.string.edit_dns), this.resources.getStringArray(R.array.dns_array)[position])
+        prefsEdit.apply()
     }
-//
-//
-//    fun packageList(){
-//        val packages = packageManager.getInstalledApplications(PackageManager.GET_META_DATA)
-//        for (li in packages){
-//            Log.d("penndev",li.packageName)
-//            Log.d("penndev",li.sourceDir)
-//            Log.d("penndev", packageManager.getApplicationIcon(li.packageName).toString())
-//
-//        }
-//        Log.d("penndev",packages.toString())
 
-//    }
+    override fun onNothingSelected(parent: AdapterView<*>?) {}
 
-//    final PackageManager pm = getPackageManager();
-////get a list of installed apps.
-//    List<ApplicationInfo> packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
-//
-//    for (ApplicationInfo packageInfo : packages) {
-//        Log.d(TAG, "Installed package :" + packageInfo.packageName);
-//        Log.d(TAG, "Source dir : " + packageInfo.sourceDir);
-//        Log.d(TAG, "Launch Activity :" + pm.getLaunchIntentForPackage(packageInfo.packageName));
-//    }
-//// t
+
 }

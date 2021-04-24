@@ -8,4 +8,9 @@
     <string name="edit_port"> 端口:</string>
     <string name="edit_dns"> DNS:</string>
     <string name="notification_message">Vpn启动中</string>
+    <string name="notif_succend_title">已启动</string>
+    <string name="notif_succend_content">正在运行中..</string>
+    <string name="notif_fail_title">启动失败</string>
+    <string name="notif_fail_content">启动失败..</string>
+
 </resources>

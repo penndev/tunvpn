@@ -43,9 +43,14 @@ class TunService : VpnService() {
                 return super.onStartCommand(intent, flags, startId)
             }
             isRun = true
-            foreground("启动中", "正在启动中..")
-            setInterFace()
+            val status = setInterFace()
+            if (status){
+                foreground(getString(R.string.notif_succend_title) , getString(R.string.notif_succend_content))
+            }else{
+                foreground(getString(R.string.notif_fail_title), getString(R.string.notif_fail_content))
+            }
             executorService.submit(TunConnect(this))
+
         }else{
             isRun = false
             destroy()
@@ -78,7 +83,6 @@ class TunService : VpnService() {
                 .establish()
 
         if (interFace == null){
-//            foreground("启动fail", "启动失败。")
             return false
         }
         return true
