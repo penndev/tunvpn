@@ -1,5 +1,7 @@
 # TunVpn 
 
+制作基于tun的隧道网络，已尝试可应用于简单场景的科学上网。
+
 ###  Download apk
 
 [Click here](../../releases)  to download the release apk file
