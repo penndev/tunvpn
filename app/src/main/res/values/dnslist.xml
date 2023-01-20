@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string-array name="dns_array">
-        <item>1.1.1.1</item>
-        <item>8.8.8.8</item>
-        <item>223.5.5.5</item>
-    </string-array>
-</resources>

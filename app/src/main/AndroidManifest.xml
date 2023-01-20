@@ -1,35 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.tunvpn">
-
+          xmlns:tools="http://schemas.android.com/tools">
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.INTERNET" />
-
     <application
-        android:allowBackup="true"
-        android:icon="@mipmap/ic_start_index"
-        android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_start_index_round"
-        android:supportsRtl="true"
-        android:theme="@style/Theme.TunVpn">
-        <activity android:name=".MainAppsActivity"></activity>
-
+            android:allowBackup="true"
+            android:dataExtractionRules="@xml/data_extraction_rules"
+            android:fullBackupContent="@xml/backup_rules"
+            android:icon="@mipmap/ic_app_launcher"
+            android:label="@string/app_name"
+            android:roundIcon="@mipmap/ic_app_launcher_round"
+            android:supportsRtl="true"
+            android:theme="@style/Theme.Tunvpn"
+            tools:targetApi="31">
         <service
-            android:name=".TunService"
-            android:enabled="true"
-            android:exported="true"
-            android:permission="android.permission.BIND_VPN_SERVICE">
+                android:name=".TunService"
+                android:enabled="true"
+                android:exported="true"
+                android:permission="android.permission.BIND_VPN_SERVICE">
             <intent-filter>
-                <action android:name="android.net.VpnService" />
+                <action android:name="android.net.VpnService"/>
             </intent-filter>
         </service>
 
-        <activity android:name=".MainActivity">
+        <activity
+                android:name=".MainActivity"
+                android:exported="true">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MAIN"/>
 
-                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+
+            <meta-data
+                    android:name="android.app.lib_name"
+                    android:value=""/>
         </activity>
     </application>
 

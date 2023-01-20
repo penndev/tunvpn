@@ -1,61 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingLeft="8dp"
-    android:paddingRight="8dp"
-    android:paddingTop="20dp"
-    android:orientation="vertical" >
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/edit_ip"></TextView>
-    <EditText
-        android:id="@+id/editText_ip"
+<androidx.appcompat.widget.LinearLayoutCompat
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="45dp"></EditText>
-
-    <TextView
-        android:layout_marginTop="20dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/edit_port"></TextView>
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingHorizontal="8dp"
+        tools:context=".MainActivity">
 
     <EditText
-        android:id="@+id/editText_port"
-        style="@style/Widget.AppCompat.EditText"
-        android:layout_width="match_parent"
-        android:layout_height="45dp"
-        android:inputType="number"></EditText>
+            android:id="@+id/input_ip"
+            android:layout_width="match_parent"
+            android:layout_marginTop="20dp"
+            android:layout_height="45dp"
+            android:background="@color/gray"
+            android:hint="@string/activity_main_ip_hits"
+            android:paddingStart="6dp"
+            tools:ignore="MissingConstraints"></EditText>
 
+    <EditText
+            android:id="@+id/input_port"
+            android:inputType="number"
+            android:layout_marginTop="20dp"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:background="@color/gray"
+            android:hint="@string/activity_main_port_hits"
+            android:paddingStart="6dp"
+            tools:ignore="MissingConstraints"></EditText>
 
-    <TextView
-        android:layout_marginTop="20dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/edit_dns"></TextView>
+    <EditText
+            android:id="@+id/input_password"
+            android:inputType="numberPassword"
+            android:layout_marginTop="20dp"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:background="@color/gray"
+            android:hint="@string/activity_main_passwd_hits"
+            android:paddingStart="6dp"
+    ></EditText>
 
-    <Spinner
-        android:id="@+id/editText_dns"
-        android:background="@drawable/bg_square_select"
-        style="@style/Widget.AppCompat.EditText"
+    <Button
+            android:id="@+id/handle_start"
+            android:layout_width="match_parent"
+            android:layout_marginTop="30dp"
+            android:layout_height="50dp"
+            android:onClick="handleStart"
+            android:text="连接"
+    ></Button>
 
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+    <Button
+            android:id="@+id/handle_stop"
+            android:layout_width="match_parent"
+            android:layout_marginTop="10dp"
+            android:layout_height="50dp"
+            android:onClick="handleStop"
+            android:text="断开"
+    ></Button>
 
-    <ImageButton
-        android:id="@+id/run"
-        android:onClick="runBtn"
-        android:layout_width="75dp"
-        android:layout_height="75dp"
-        android:scaleType="centerCrop"
-        android:background="@drawable/ic_main_run_off"
-        android:layout_gravity="center"
-        android:layout_marginTop="200dp"
-        ></ImageButton>
-
-
-</LinearLayout>
-
-
+</androidx.appcompat.widget.LinearLayoutCompat>
