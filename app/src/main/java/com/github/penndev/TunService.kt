@@ -7,17 +7,22 @@ import android.app.PendingIntent
 import android.content.Intent
 import android.net.VpnService
 import android.os.Build
+import android.os.ParcelFileDescriptor
 import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import kotlinx.coroutines.*
-import java.net.Socket
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.nio.ByteBuffer
 
 
 class TunService : VpnService() {
+    // tun 设备
+    private var localTunnel: ParcelFileDescriptor? = null
 
     // 工作进程
-    private lateinit var job: Job
+    private var job: Job? = null
 
     // 远程服务器IP地址
     private var serviceIp: String? = null
@@ -67,7 +72,7 @@ class TunService : VpnService() {
             return START_NOT_STICKY
         }
 
-        // 处理前端展示服务
+        // 转换为前端服务
         val channelId = getText(R.string.app_name).toString()
         val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannel(NotificationChannel(channelId, channelId, NotificationManager.IMPORTANCE_DEFAULT))
@@ -75,23 +80,39 @@ class TunService : VpnService() {
         val pendingIntent = Intent(this, MainActivity::class.java).let {intent ->
             PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_MUTABLE)
         }
-        val notific = Notification.Builder(this, channelId)
+        val notice = Notification.Builder(this, channelId)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentTitle("服务器标题").setContentText("服务器前台启动中")
             .setContentIntent(pendingIntent)
             .build()
-        startForeground(1,notific)
+        startForeground(1, notice)
 
-        job = GlobalScope.launch {
+        //
+        val builder = Builder()
+        localTunnel = builder
+            .addAddress("192.168.2.2", 24)
+            .addRoute("0.0.0.0", 0)
+            .addDnsServer("192.168.1.1")
+            .establish()
+
+
+
+        //job = GlobalScope.launch {
 
             try {
                 Log.i("penndev", "job:  start")
-                var builder = Builder()
-                builder.addAddress("192.168.0.1",32)
-                var tunFd = builder.establish()
+
+                var tunRead = FileInputStream(localTunnel.fileDescriptor)
+                var tunWrite = FileOutputStream(localTunnel.fileDescriptor)
+                val buf = ByteBuffer.allocate(32767)
+                while (true){
+                    val len = tunRead.read(buf.array())
+                    Log.i("penndev", "tun read from tun : $len")
+                }
                 // 创建socket
-                var sockFd = Socket(serviceIp,servicePort)
-                protect(sockFd)
+                //var sockFd = Socket(serviceIp,servicePort)
+                //protect(sockFd)
+
             }catch (e: Exception){
                 Toast.makeText(this@TunService,"vpn连接错误",Toast.LENGTH_LONG).show()
                 Log.i("penndev", "Job Err: $e")
@@ -99,7 +120,7 @@ class TunService : VpnService() {
                 Log.i("penndev", "job:  finally")
             }
 
-        }
+        //}
 
         return START_NOT_STICKY //super.onStartCommand(intent, flags, startId)
     }
@@ -109,7 +130,9 @@ class TunService : VpnService() {
      */
     override fun onDestroy() {
         Log.d("penndev", "Android TunService onDestroy")
-        //job.cancel()
+
+        job?.cancel()
+        localTunnel?.close()
         super.onDestroy()
     }
 
