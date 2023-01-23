@@ -1,11 +1,9 @@
 package com.github.penndev
 
-
 import android.content.Intent
 import android.net.VpnService
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.EditText
 import android.widget.Toast
@@ -43,7 +41,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        serverIp = "192.168.0.1"
+        serverIp = "185.227.70.252"
         serverPort = 8000
     }
 
@@ -66,7 +64,7 @@ class MainActivity : AppCompatActivity() {
      * 监听停止
      */
     fun handleStop(view: View){
-        stopService(intentTunService)
+        startService(intentTunService.putExtra("close",true))
     }
 
     /**

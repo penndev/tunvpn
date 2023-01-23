@@ -12,12 +12,16 @@ import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import kotlinx.coroutines.*
+import java.io.FileDescriptor
 import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.net.InetSocketAddress
 import java.nio.ByteBuffer
+import java.nio.channels.DatagramChannel
 
 
 class TunService : VpnService() {
+    private var status: Boolean = false
     // tun 设备
     private var localTunnel: ParcelFileDescriptor? = null
 
@@ -30,109 +34,155 @@ class TunService : VpnService() {
     // 远程服务器端口
     private var servicePort: Int = 0
 
-
-    ///**
-    // * 进行服务器连接
-    // */
-    //private fun handleSetup() {
-    //    job = GlobalScope.launch {
-    //        Log.i("penndev", "onCreate:  start")
-    //        Thread.sleep(5000)
-    //        Log.i("penndev", "onCreate:  finish")
-    //    }
+    //private var pendingIntent: PendingIntent? = null
+    //override fun onCreate() {
     //}
-
-    override fun onCreate() {
-        Log.i("penndev", "Android TunService onCreate")
-        super.onCreate()
-    }
 
     /**
      * 启动命令
      */
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Log.i("penndev", "Android TunService onStartCommand")
-
+        Log.i("penndev", "Android TunService onStartCommand $status")
         // 处理启动的参数
-        if(intent == null){
-            Toast.makeText(this,"传参错误",Toast.LENGTH_LONG).show()
-            return START_NOT_STICKY
-        }
-
-        serviceIp = intent.getStringExtra("serviceIp")
-        if(serviceIp == null){
-            Toast.makeText(this,"IP错误",Toast.LENGTH_LONG).show()
-            return START_NOT_STICKY
-        }
-
-        servicePort = intent.getIntExtra("servicePort", 0)
-        if (servicePort <= 0){
-            Toast.makeText(this,"端口错误",Toast.LENGTH_LONG).show()
+        try {
+            setupCommand(intent)
+        }catch (e: Exception){
+            Toast.makeText(this,e.message,Toast.LENGTH_SHORT).show()
             return START_NOT_STICKY
         }
 
         // 转换为前端服务
-        val channelId = getText(R.string.app_name).toString()
-        val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.createNotificationChannel(NotificationChannel(channelId, channelId, NotificationManager.IMPORTANCE_DEFAULT))
+        setupForeground()
+        return START_NOT_STICKY
+        // 启动/dev/tun 设备
+        setupBuilder()
 
-        val pendingIntent = Intent(this, MainActivity::class.java).let {intent ->
-            PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_MUTABLE)
-        }
-        val notice = Notification.Builder(this, channelId)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setContentTitle("服务器标题").setContentText("服务器前台启动中")
-            .setContentIntent(pendingIntent)
-            .build()
-        startForeground(1, notice)
+        job = GlobalScope.launch {
+            Log.i("penndev", "job:  start")
 
-        //
-        val builder = Builder()
-        localTunnel = builder
-            .addAddress("192.168.2.2", 24)
-            .addRoute("0.0.0.0", 0)
-            .addDnsServer("192.168.1.1")
-            .establish()
+            // 创建本地tun设备
+            val tunFd = localTunnel?.fileDescriptor
+            val tunRead = FileInputStream(tunFd)
+            val tunWrite = FileOutputStream(tunFd)
 
+            // 创建 udp socket
+            val sock = DatagramChannel.open()
+            protect(sock.socket())
+            val client = InetSocketAddress(serviceIp,servicePort)
+            sock.connect(client)
+            sock.configureBlocking(false)
 
+            var readCount = 0
+            val readBuf = ByteBuffer.allocate(32767)
+            while (isActive) try{
+                readCount ++
 
-        //job = GlobalScope.launch {
-
-            try {
-                Log.i("penndev", "job:  start")
-
-                var tunRead = FileInputStream(localTunnel.fileDescriptor)
-                var tunWrite = FileOutputStream(localTunnel.fileDescriptor)
-                val buf = ByteBuffer.allocate(32767)
-                while (true){
-                    val len = tunRead.read(buf.array())
-                    Log.i("penndev", "tun read from tun : $len")
+                val tunReadLen = tunRead.read(readBuf.array())
+                if(tunReadLen > 0){
+                    readCount = 0
+                    readBuf.limit(tunReadLen)
+                    sock.write(readBuf)
+                    readBuf.clear()
+                    Log.i("penndev", "sock read from tun : $tunReadLen")
                 }
-                // 创建socket
-                //var sockFd = Socket(serviceIp,servicePort)
-                //protect(sockFd)
 
+                val sockReadLen = sock.read(readBuf)
+                if (sockReadLen > 0){
+                    readCount = 0
+                    readBuf.limit(tunReadLen)
+                    tunWrite.write(readBuf.array(),0,sockReadLen)
+                    readBuf.clear()
+                    Log.i("penndev", "tun read from sock : $sockReadLen")
+                }
+
+                if (readCount > 5){
+                    Thread.sleep(100);
+                }
             }catch (e: Exception){
-                Toast.makeText(this@TunService,"vpn连接错误",Toast.LENGTH_LONG).show()
                 Log.i("penndev", "Job Err: $e")
-            }finally {
-                Log.i("penndev", "job:  finally")
+                //return@launch
+                Thread.sleep(1000)
             }
 
-        //}
+        }
 
         return START_NOT_STICKY //super.onStartCommand(intent, flags, startId)
     }
+
+    private fun setupBuilder(): FileDescriptor {
+        val builder = Builder()
+        localTunnel = builder
+            .setMtu(1400)
+            .addAddress("10.0.0.2", 32)
+            .addRoute("0.0.0.0", 0)
+            .addDnsServer("8.8.8.8")
+            .establish()
+        if(localTunnel == null){
+            throw Exception("启动隧道失败")
+        }
+        return localTunnel!!.fileDescriptor
+    }
+
+    /**
+     * 转换为前端服务
+     */
+
+    private fun setupForeground(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channelId = getText(R.string.app_name).toString()
+            val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(NotificationChannel(channelId, channelId, NotificationManager.IMPORTANCE_DEFAULT))
+            var intent = Intent(this, MainActivity::class.java)
+            var pendingIntent =  PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_MUTABLE)
+            val notice = Notification.Builder(this, channelId)
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setContentIntent(pendingIntent)
+                .setContentTitle("服务器标题")
+                .setContentText("服务器前台启动中")
+                .build()
+            startForeground(1, notice)
+        }
+    }
+
+    /**
+     * 初始化验证参数
+     */
+    private fun setupCommand(intent: Intent?) {
+        if(intent == null){
+            throw Exception("传参错误")
+        }
+        // 处理函数校验
+        if(intent.getBooleanExtra("close",false)){
+            onDestroy()
+            throw Exception("关闭成功")
+        }
+        // 处理系统状态
+        if (status){
+            throw Exception("正在运行中")
+        }
+        status = true
+
+        serviceIp = intent.getStringExtra("serviceIp")
+        if(serviceIp == null){
+            throw Exception("IP错误")
+        }
+
+        servicePort = intent.getIntExtra("servicePort", 0)
+        if (servicePort <= 0){
+            throw Exception("端口错误")
+        }
+    }
+
 
     /**
      * 销毁命令
      */
     override fun onDestroy() {
         Log.d("penndev", "Android TunService onDestroy")
-
         job?.cancel()
         localTunnel?.close()
+        status = false
+        stopForeground(true);
         super.onDestroy()
     }
 
@@ -140,7 +190,9 @@ class TunService : VpnService() {
      * 停止服务
      */
     override fun onRevoke() {
-        Toast.makeText(this,"我知道你从其他地方关闭了vpn",Toast.LENGTH_LONG).show()
+        Log.d("penndev", "Android TunService onRevoke")
+        Toast.makeText(this,"Android TunService onRevoke",Toast.LENGTH_LONG).show()
+        onDestroy()
     }
 }
 
