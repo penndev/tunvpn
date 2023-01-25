@@ -41,8 +41,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        serverIp = "185.227.70.252"
-        serverPort = 8000
     }
 
     /**

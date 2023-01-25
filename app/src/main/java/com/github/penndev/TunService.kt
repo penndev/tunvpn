@@ -53,7 +53,6 @@ class TunService : VpnService() {
 
         // 转换为前端服务
         setupForeground()
-        return START_NOT_STICKY
         // 启动/dev/tun 设备
         setupBuilder()
 
@@ -100,8 +99,7 @@ class TunService : VpnService() {
                 }
             }catch (e: Exception){
                 Log.i("penndev", "Job Err: $e")
-                //return@launch
-                Thread.sleep(1000)
+                return@launch
             }
 
         }
@@ -113,7 +111,7 @@ class TunService : VpnService() {
         val builder = Builder()
         localTunnel = builder
             .setMtu(1400)
-            .addAddress("10.0.0.2", 32)
+            .addAddress("10.0.0.200", 32)
             .addRoute("0.0.0.0", 0)
             .addDnsServer("8.8.8.8")
             .establish()
