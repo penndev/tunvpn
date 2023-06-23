@@ -1,7 +1,7 @@
 
 ## TunVpn 
 
-> 对Android流量进行转发
+> 对Android 进行vpn tun 设备流量进行转发。
 
 待实现一下功能
 
