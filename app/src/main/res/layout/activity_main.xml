@@ -41,6 +41,13 @@
     ></EditText>
 
     <Button
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="选择代理应用"
+    ></Button>
+
+
+    <Button
             android:id="@+id/handle_start"
             android:layout_width="match_parent"
             android:layout_marginTop="30dp"
