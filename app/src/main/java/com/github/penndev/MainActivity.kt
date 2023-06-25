@@ -7,45 +7,31 @@ import android.view.View
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-
 class MainActivity : AppCompatActivity() {
-
     private val intentTunService: Intent
-        get(){
-            return Intent(this,TunService::class.java)
-        }
+        get() = Intent(this,TunService::class.java)
 
     private var serverIp: String
         get() = findViewById<EditText>(R.id.input_ip).text.toString()
-        set(value){
-            findViewById<EditText>(R.id.input_ip).setText(value)
-        }
+        set(value) = findViewById<EditText>(R.id.input_ip).setText(value)
 
     private var serverPort: Int
         get() = findViewById<EditText>(R.id.input_port).text.toString().toInt()
-        set(value){
-            findViewById<EditText>(R.id.input_port).setText(value.toString())
-        }
-
+        set(value) = findViewById<EditText>(R.id.input_port).setText(value.toString())
 
     private var serverPassword: String
         get() = findViewById<EditText>(R.id.input_password).text.toString()
-        set(value){
-            findViewById<EditText>(R.id.input_password).setText(value)
-        }
+        set(value) = findViewById<EditText>(R.id.input_password).setText(value)
 
-
-    /**
-     * 初始化UI入口
-     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
     }
 
-    /**
-     * 监听启动
-     */
+    fun handleAllowApp(view:View) {
+
+    }
+
     fun handleStart(view: View) {
         val intentPrepare = VpnService.prepare(this)
         if (intentPrepare != null){
@@ -58,15 +44,21 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * 监听停止
-     */
     fun handleStop(view: View){
         startService(intentTunService.putExtra("close",true))
     }
 
+
     /**
-     * 授权vpn回调。
+     * 允许部分应用使用tunvpn，或者禁止部分应用使用tunvpn
+     */
+    fun onStartAllowApp() {
+
+    }
+
+
+    /**
+     * 请求用户授权开启vpn的结果
      */
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -81,5 +73,4 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
 }

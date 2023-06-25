@@ -1,9 +1,14 @@
 <resources>
     <string name="app_name">TunVPN</string>
 
+    <string name="activity_loading_skip">进入</string>
+    <string name="activity_loading_homepage">https://github.com/penndev/tunvpn</string>
+
     <!-- main activity -->
     <string name="activity_main_ip_hits">请输入服务器IP</string>
     <string name="activity_main_port_hits">请输入服务器端口</string>
     <string name="activity_main_passwd_hits">请输入连接密码</string>
+    <string name="activity_main_select_app">过滤应用</string>
+
 
 </resources>

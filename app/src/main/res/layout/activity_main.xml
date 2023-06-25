@@ -41,11 +41,15 @@
     ></EditText>
 
     <Button
+            android:layout_marginTop="20dp"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:text="选择代理应用"
+            android:layout_height="45dp"
+            android:text="@string/activity_main_select_app"
+            android:paddingStart="6dp"
+            android:backgroundTint="@color/gray"
+            android:textColor="@color/black"
+            android:onClick="handleAllowApp"
     ></Button>
-
 
     <Button
             android:id="@+id/handle_start"
