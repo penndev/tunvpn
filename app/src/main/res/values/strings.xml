@@ -8,7 +8,7 @@
     <string name="activity_main_ip_hits">请输入服务器IP</string>
     <string name="activity_main_port_hits">请输入服务器端口</string>
     <string name="activity_main_passwd_hits">请输入连接密码</string>
-    <string name="activity_main_select_app">过滤应用</string>
+    <string name="activity_main_select_app">请选择代理的应用</string>
 
 
 </resources>

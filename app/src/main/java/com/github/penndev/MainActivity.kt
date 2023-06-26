@@ -29,7 +29,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun handleAllowApp(view:View) {
-
+        onStartAllowApp()
     }
 
     fun handleStart(view: View) {
@@ -52,8 +52,9 @@ class MainActivity : AppCompatActivity() {
     /**
      * 允许部分应用使用tunvpn，或者禁止部分应用使用tunvpn
      */
-    fun onStartAllowApp() {
-
+    private fun onStartAllowApp() {
+        val intent = Intent(this, AllowAppActivity::class.java)
+        startActivity(intent)
     }
 
 
