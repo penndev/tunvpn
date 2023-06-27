@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
+import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.TextView
 
@@ -31,19 +32,32 @@ class AppListAdapter(private val context: Context, private val appList: List<App
         val viewHolder: ViewHolder
         var itemView = convertView
         if (itemView == null) {
-            itemView = LayoutInflater.from(context).inflate(R.layout.adapter_app_item, parent, false)
+            itemView = LayoutInflater.from(context).inflate(
+                R.layout.adapter_app_item,
+                parent,
+                false
+            )
             viewHolder = ViewHolder()
             viewHolder.imageView = itemView.findViewById(R.id.imageView)
             viewHolder.textView = itemView.findViewById(R.id.textView)
+            viewHolder.checkBox = itemView.findViewById(R.id.checkBox)
             itemView.tag = viewHolder
         } else {
             viewHolder = itemView.tag as ViewHolder
         }
-        itemView?.setBackgroundColor(if (selectedItems.get(position)) Color.LTGRAY else Color.TRANSPARENT)
-
+        itemView?.setBackgroundColor(
+            if (selectedItems.get(position))
+                Color.LTGRAY
+            else
+                Color.TRANSPARENT
+        )
         val appInfo: ApplicationInfo = appList[position]
         viewHolder.imageView.setImageDrawable(appInfo.loadIcon(context.packageManager))
-        viewHolder.textView.text = appInfo?.loadLabel(context.packageManager)
+        viewHolder.textView.text = appInfo.loadLabel(context.packageManager)
+        // 判断是否选择
+
+
+
         return itemView!!
     }
 
@@ -66,5 +80,6 @@ class AppListAdapter(private val context: Context, private val appList: List<App
     private class ViewHolder {
         lateinit var imageView: ImageView
         lateinit var textView: TextView
+        lateinit var checkBox: CheckBox
     }
 }

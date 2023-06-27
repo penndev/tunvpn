@@ -20,21 +20,14 @@ class AllowAppActivity : AppCompatActivity() {
 
     @SuppressLint("QueryPermissionsNeeded")
     private fun getInstalledApps(): List<ApplicationInfo> {
-        val packageManager = packageManager
         val installedApps: MutableList<ApplicationInfo> = ArrayList()
-
-        // 获取所有已安装应用的信息
         val allApps = packageManager.getInstalledApplications(PackageManager.GET_META_DATA)
-
-        // 过滤出非系统应用
         for (app in allApps) {
-            if (app.flags and ApplicationInfo.FLAG_SYSTEM <= 0 &&
-                //app.flags and ApplicationInfo.FLAG_UPDATED_SYSTEM_APP == 0 &&
-                app.packageName != packageName ) {
+            val isNoSelf =  app.packageName != packageName
+            if (isNoSelf) {
                 installedApps.add(app)
             }
         }
-
         return installedApps
     }
 
