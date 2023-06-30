@@ -1,5 +1,6 @@
 package com.github.penndev
 
+import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -11,10 +12,11 @@ import android.util.Log
 import android.widget.RemoteViews
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import java.io.FileInputStream
+import java.net.InetSocketAddress
+import java.nio.ByteBuffer
+import java.nio.channels.DatagramChannel
 
 
 class TunService : VpnService() {
@@ -59,31 +61,65 @@ class TunService : VpnService() {
 
     private fun setupVpnServe(){
         setupNotifyForeground() // 初始化启动通知
-        // 获取远程认证。并获取本地的IP配置dns等等。
 
 
         job = GlobalScope.launch {
-            var i = 0
-            while (true){
-                delay(5000)
-                Log.i("penndev", "debug print here123->$i")
-                updateNotification("debug print here123->$i")
-                i ++
+            // 避免线程阻塞
+            val sock = DatagramChannel.open()
+            protect(sock.socket())
+            val client = InetSocketAddress(serviceIp,servicePort)
+            sock.connect(client)
+
+            // 获取远程认证。并获取本地的IP配置dns等等。
+            localTunnel = Builder()
+                .addRoute("0.0.0.0", 0)
+                .addAddress("10.0.0.200", 32)
+                .establish()
+            if(localTunnel == null){
+                throw Exception("启动隧道失败")
+            }
+
+            val tunFd = localTunnel?.fileDescriptor
+            val tunRead = FileInputStream(tunFd)
+
+            //主要内容
+            val readBuf = ByteBuffer.allocate(32767)
+            while (isActive) try{
+                readBuf.clear()
+                val readBufLen = withContext(Dispatchers.IO) {
+                    tunRead.read(readBuf.array())
+                }
+                if(readBufLen > 0){
+                    readBuf.limit(readBufLen)
+                    sock.write(readBuf)
+                }
+            }catch (e: Exception){
+                Log.i("penndev", "Job Err: $e")
+                return@launch
             }
         }
+
+        //
+        //job = CoroutineScope(Dispatchers.Default).launch {
+        //    val readBuf = ByteBuffer.allocate(32767)
+        //    while (true){
+
+        //    }
+        //}
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         // 处理重复启动，关闭等操作。
         try {
             setupCommand(intent)
+            setupVpnServe()
         }catch (e: Exception){ //处理抛出异常问题
             Toast.makeText(this,e.message,Toast.LENGTH_SHORT).show()
-            return START_NOT_STICKY
         }
         return START_NOT_STICKY
     }
 
+    @SuppressLint("UnspecifiedImmutableFlag")
     private fun setupNotifyForeground() {
         notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
 
@@ -119,7 +155,7 @@ class TunService : VpnService() {
         job?.cancel()
         localTunnel?.close()
         status = false
-        stopForeground(true);
+        stopForeground(true)
         super.onDestroy()
     }
 
