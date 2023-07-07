@@ -14,12 +14,8 @@ import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import kotlinx.coroutines.*
 import java.io.FileDescriptor
-import java.io.FileInputStream
-import java.io.FileOutputStream
 import java.net.InetSocketAddress
-import java.nio.ByteBuffer
 import java.nio.channels.DatagramChannel
-
 
 class TunService : VpnService() {
 
@@ -78,7 +74,7 @@ class TunService : VpnService() {
 
     private fun setService() {
         serviceSock = DatagramChannel.open()
-        Log.i("penndev",protect(serviceSock.socket()).toString())
+        protect(serviceSock.socket())
         serviceSock.connect(InetSocketAddress(serviceIp, servicePort))
 
         tun = Builder()
@@ -86,53 +82,69 @@ class TunService : VpnService() {
             .addDnsServer("8.8.8.8")
             .addRoute("0.0.0.0", 0)
             .addAddress("10.0.0.2", 32)
+            .addDisallowedApplication(packageName)
             .establish() ?: throw Exception("启动隧道失败")
-        tunFd = tun?.fileDescriptor!!
+        //tunFd = tun?.fileDescriptor!!
     }
 
     private fun setupVpnServe() {
         setupNotifyForeground() // 初始化启动通知
 
         job = GlobalScope.launch {
-            setService()
-            updateNotification("发送通知完成")
-
-            val readSock = launch {
-                val packet = ByteBuffer.allocate(32767)
-                val tunWrite = FileOutputStream(tunFd)
-                serviceSock.configureBlocking(false)
-                while (true){
-                    val readLen = serviceSock.read(packet)
-                    if (readLen > 0){
-                        if (packet[0].toInt() != 0) {
-                            tunWrite.write(packet.array(),0,readLen)
-                        }
-                        packet.clear()
-                    }else {
-                        delay(100)
-                    }
-                }
+            try {
+                setService()
+                updateNotification("发送通知完成")
+                val key = engine.Key()
+                //key.mark = 0
+                //key.mtu = 0
+                key.device = "fd://" + tun?.fd// <--- here
+                //key.setInterface("")
+                key.logLevel = "debug"
+                key.proxy = "socks5://192.168.7.11:1080" // <--- and here
+                //key.restAPI = ""
+                //key.tcpSendBufferSize = ""
+                //key.tcpReceiveBufferSize = ""
+                //key.tcpModerateReceiveBuffer = false
+                engine.Engine.insert(key)
+                engine.Engine.start()
+                //val readSock = launch {
+                //    val packet = ByteBuffer.allocate(32767)
+                //    val tunWrite = FileOutputStream(tunFd)
+                //    serviceSock.configureBlocking(false)
+                //    while (true){
+                //        val readLen = serviceSock.read(packet)
+                //        if (readLen > 0){
+                //            if (packet[0].toInt() != 0) {
+                //                tunWrite.write(packet.array(),0,readLen)
+                //            }
+                //            packet.clear()
+                //        }else {
+                //            delay(100)
+                //        }
+                //    }
+                //}
+                //
+                //var readTun = launch {
+                //    val packet = ByteBuffer.allocate(32767)
+                //    val tunReader = FileInputStream(tunFd)
+                //    while (true){
+                //        val readLen = tunReader.read(packet.array())
+                //        if (readLen > 0){
+                //            packet.limit(readLen)
+                //            serviceSock.write(packet)
+                //            packet.clear()
+                //        }else {
+                //            delay(100)
+                //        }
+                //    }
+                //}
+                //
+                //readSock.join()
+                //readTun.join()
+            } catch (e: Exception) { //处理抛出异常问题
+                Log.e("penndev", "服务引起异常", e)
             }
-
-            var readTun = launch {
-                val packet = ByteBuffer.allocate(32767)
-                val tunReader = FileInputStream(tunFd)
-                while (true){
-                    val readLen = tunReader.read(packet.array())
-                    if (readLen > 0){
-                        packet.limit(readLen)
-                        serviceSock.write(packet)
-                        packet.clear()
-                    }else {
-                        delay(100)
-                    }
-                }
-            }
-
-            readSock.join()
-            readTun.join()
         }
-
 
     }
 
