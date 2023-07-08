@@ -1,6 +1,7 @@
 
 ## TunVpn 
 
-> 对Android 进行vpn tun 设备流量进行转发。
+> vpn android 客户端支持tun模式IP帧数据,同时支持socks5协议。
 
-使用 golang做service，简单用户认证。
+- tun ip帧认证,服务端部署 ./server 文件。
+- socks5模式，使用任意的socks5客户端。
