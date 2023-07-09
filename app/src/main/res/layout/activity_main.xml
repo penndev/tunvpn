@@ -8,6 +8,27 @@
         android:paddingHorizontal="8dp"
         tools:context=".MainActivity">
 
+    <RadioGroup
+            android:id="@+id/input_type"
+            android:layout_marginTop="20dp"
+            android:layout_height="45dp"
+            android:layout_width="match_parent"
+            android:background="@color/gray"
+            android:orientation="horizontal">
+        <RadioButton
+                android:id="@+id/input_type_tun"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Tun 模式" />
+        <RadioButton
+                android:id="@+id/input_type_socks5"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Socks5 模式" />
+    </RadioGroup>
+
     <EditText
             android:id="@+id/input_ip"
             android:layout_width="match_parent"
@@ -29,10 +50,22 @@
             android:paddingStart="6dp"
             tools:ignore="MissingConstraints"></EditText>
 
+
+    <EditText
+            android:id="@+id/input_username"
+            android:inputType="text"
+            android:layout_marginTop="20dp"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:background="@color/gray"
+            android:hint="@string/activity_main_name_hits"
+            android:paddingStart="6dp"
+    ></EditText>
+
     <EditText
             android:id="@+id/input_password"
-            android:inputType="numberPassword"
             android:layout_marginTop="20dp"
+            android:inputType="numberPassword"
             android:layout_width="match_parent"
             android:layout_height="45dp"
             android:background="@color/gray"

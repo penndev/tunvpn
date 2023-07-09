@@ -44,7 +44,7 @@
         </activity>
 
         <service
-                android:name=".TunService"
+                android:name=".service.Socks5Service"
                 android:enabled="true"
                 android:exported="true"
                 android:permission="android.permission.BIND_VPN_SERVICE">
