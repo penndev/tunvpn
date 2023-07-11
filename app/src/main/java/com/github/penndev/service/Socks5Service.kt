@@ -17,7 +17,7 @@ class Socks5Service : BaseService() {
     }
 
     override fun setupVpnServe() {
-        Log.i("penndev", "startService i am here")
+        Log.i("penndev", "setupVpnServe socks5")
         setupNotifyForeground() // 初始化启动通知
         setupTun() // 设置代理设备
         job = GlobalScope.launch {
