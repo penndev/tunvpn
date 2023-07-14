@@ -4,6 +4,7 @@ import android.util.Log
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 import java.io.FileDescriptor
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -23,6 +24,17 @@ class TunService : BaseService() {
             throw Exception("启动代理设备失败")
         }
         serviceSock.connect(InetSocketAddress(serviceIp, servicePort))
+        serviceSock.configureBlocking(false)
+
+        val auth = JSONObject()
+        auth.put("username", serviceUserName)
+        auth.put("password", servicePassword)
+        var authByte = byteArrayOf(0) + auth.toString().toByteArray()
+        var authBuffer = ByteBuffer.wrap( authByte )
+
+        serviceSock.write(authBuffer)
+        serviceSock.write(authBuffer)
+        serviceSock.write(authBuffer)
 
         tun = Builder()
             .setMtu(1400)
@@ -45,7 +57,6 @@ class TunService : BaseService() {
                 val readSock = launch {
                     val packet = ByteBuffer.allocate(32767)
                     val tunWrite = FileOutputStream(tunFd)
-                    serviceSock.configureBlocking(false)
                     while (true){
                         val readLen = serviceSock.read(packet)
                         if (readLen > 0){
