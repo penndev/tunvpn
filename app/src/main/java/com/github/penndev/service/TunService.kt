@@ -18,7 +18,18 @@ class TunService : BaseService() {
 
     private lateinit var serviceSock: DatagramChannel
 
-    private fun setService() {
+    private fun setDevice(mtu:Int, ip:String, dns: String) {
+        tun = Builder()
+            .setMtu(mtu)
+            .addAddress(ip, 32)
+            .addDnsServer(dns)
+            .addRoute("0.0.0.0", 0)
+            .addDisallowedApplication(packageName)
+            .establish() ?: throw Exception("启动隧道失败")
+        tunFd = tun?.fileDescriptor!!
+    }
+
+    private suspend fun setService() {
         serviceSock = DatagramChannel.open()
         if(!protect(serviceSock.socket())) {
             throw Exception("启动代理设备失败")
@@ -33,17 +44,22 @@ class TunService : BaseService() {
         var authBuffer = ByteBuffer.wrap( authByte )
 
         serviceSock.write(authBuffer)
-        serviceSock.write(authBuffer)
-        serviceSock.write(authBuffer)
 
-        tun = Builder()
-            .setMtu(1400)
-            .addDnsServer("8.8.8.8")
-            .addRoute("0.0.0.0", 0)
-            .addAddress("10.0.0.2", 32)
-            .addDisallowedApplication(packageName)
-            .establish() ?: throw Exception("启动隧道失败")
-        tunFd = tun?.fileDescriptor!!
+        serviceSock.write(authBuffer)
+        repeat(3) { iteration ->
+            serviceSock.write(authBuffer)
+            delay(1000) // 阻塞一秒
+            val packet = ByteBuffer.allocate(32767)
+            val readLen = serviceSock.read(packet)
+            if (readLen > 0 && packet[0].toInt() == 0 ){
+                var res = JSONObject( String(packet.array(), 1, readLen-1))
+                if ( res.getInt("code") != 1) {
+                    throw Exception("用户认证失败")
+                }
+                return setDevice(res.getInt("mtu"), res.getString("ip"),res.getString("dns"))
+            }
+        }
+        throw Exception("超时")
     }
 
     override fun setupVpnServe() {
@@ -56,7 +72,7 @@ class TunService : BaseService() {
 
                 val readSock = launch {
                     val packet = ByteBuffer.allocate(32767)
-                    val tunWrite = FileOutputStream(tunFd)
+                    val tunWrite = FileOutputStream(tunFd!!)
                     while (true){
                         val readLen = serviceSock.read(packet)
                         if (readLen > 0){
@@ -88,6 +104,7 @@ class TunService : BaseService() {
                 readSock.join()
                 readTun.join()
             } catch (e: Exception) { //处理抛出异常问题
+                updateNotification(e.message.toString())
                 Log.e("penndev", "服务引起异常", e)
             }
         }
